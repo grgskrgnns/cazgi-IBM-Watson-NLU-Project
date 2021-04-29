@@ -1,5 +1,4 @@
 const express = require('express');
-
 const dotenv = require('dotenv')
 dotenv.config();
 
@@ -21,6 +20,22 @@ function getNLUInstance() {
 return naturalLanguageUnderstanding;
 }
 
+function analyze(analyzeParams,res) {
+    let languageAnalyzer = getNLUInstance();
+
+      
+  languageAnalyzer.analyze(analyzeParams)
+  .then(analysisResults => {
+    res.send(JSON.stringify(analysisResults, null, 2));
+  })
+  .catch(err => {
+    res.send(err.toString());
+  });
+    
+  
+}
+
+
 const app = new express();
 
 app.use(express.static('client'))
@@ -34,19 +49,57 @@ app.get("/",(req,res)=>{
 
 app.get("/url/emotion", (req,res) => {
 
-    return res.send({"happy":"90","sad":"10"});
+       
+    const analyzeParams = {
+      url: req.query.url,
+      features: {
+        emotion: {},
+        keywords: {},
+      },
+    }
+    
+    return analyze(analyzeParams,res);
 });
 
 app.get("/url/sentiment", (req,res) => {
-    return res.send("url sentiment for "+req.query.url);
+    
+    const analyzeParams = {
+      url: req.query.url,
+      features: {
+        sentiment: {},
+        keywords: {},
+      },
+    }
+    
+    return analyze(analyzeParams,res);
 });
 
 app.get("/text/emotion", (req,res) => {
-    return res.send({"happy":"10","sad":"90"});
+    
+    const analyzeParams = {
+      text: req.query.text,
+      features: {
+        emotion: {},
+        keywords: {},
+      },
+    }
+    
+
+    return analyze(analyzeParams,res);
 });
 
 app.get("/text/sentiment", (req,res) => {
-    return res.send("text sentiment for "+req.query.text);
+         
+    const analyzeParams = {
+      text: req.query.text,
+      features: {
+        sentiment: {},
+        keywords: {},
+      },
+    }
+    
+
+    return analyze(analyzeParams,res);
 });
 
 let server = app.listen(8080, () => {
